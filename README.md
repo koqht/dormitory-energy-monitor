@@ -1,107 +1,149 @@
 # 高校学生公寓智能电表数据可视化系统
 
-基于 Spring Boot + Vue 3 + MySQL + ECharts 的宿舍用电管理系统。
 
-## 环境要求
 
-| 软件 | 版本 | 说明 |
-|------|------|------|
-| JDK | 1.8+ | `java -version` 确认 |
-| Maven | 3.0.5+ | `mvn -version` 确认 |
-| MySQL | 5.7+ | `mysql --version` 确认，需创建数据库 |
-| Node.js | 16+ | `node -v` 确认，用于前端 |
+---
 
-## 快速开始
+## 一、安装 4 个必备软件
 
-### 1. 克隆项目
+下面 4 个软件都需要装上。
 
-```bash
-git clone https://github.com/koqht/dormitory-energy-monitor.git
-cd dormitory-energy-monitor
+### 1. Java（JDK）
+
+去 Oracle 官网下载 JDK 8 安装包：
+
+https://www.oracle.com/java/technologies/downloads/#java8-windows
+
+- 选 **Windows x64 Installer**（一般是 `jdk-8uXXX-windows-x64.exe`）
+- 下载后双击 → 一路点 **下一步** 到完成
+- 验证：打开 Windows 搜索框 → 输入 `cmd` → 回车 → 输入 `java -version` → 看到版本号就 OK
+
+### 2. Node.js
+
+去 Node.js 官网下载 LTS 版本：
+
+https://nodejs.org
+
+- 左边绿色按钮 "LTS" → 下载 → 双击安装
+- 一路点 **Next** 到完成，所有选项默认即可
+- 验证：打开 cmd → 输入 `node -v` → 看到版本号就 OK
+
+### 3. MySQL 数据库
+
+去 MySQL 官网下载社区版：
+
+https://dev.mysql.com/downloads/installer/
+
+- 下载 `mysql-installer-community-5.7.xx.msi`（或 8.0 版本）
+- 双击安装 → 选 **Developer Default** → 一路 Next
+- **关键一步**：安装过程中会让你设置 root 密码，记下来（比如设为 `123456`）
+- 验证：打开 cmd → 输入 `mysql -u root -p` → 输入密码 → 看到 `mysql>` 就 OK
+
+
+### 4. Maven
+
+去 Maven 官网下载：
+
+https://maven.apache.org/download.cgi
+
+- 下载 **Binary zip archive**（`apache-maven-3.8.8-bin.zip`）
+- 解压到 `C:\Program Files\` 或你喜欢的任何位置
+- 配置环境变量（见下方）
+
+**配置 Maven 环境变量（这一步稍微复杂，照着做就行）：**
+
+```
+1. 右键"此电脑" → 属性 → 高级系统设置 → 环境变量
+2. 在"系统变量"里点"新建"：
+   变量名：MAVEN_HOME
+   变量值：C:\Program Files\apache-maven-3.8.8  （改成你实际解压的路径）
+3. 找到"系统变量"里的 Path → 编辑 → 新建 → 输入：
+   %MAVEN_HOME%\bin
+4. 全部点"确定"关闭
 ```
 
-### 2. 初始化数据库
+验证：打开 cmd → 输入 `mvn -version` → 看到版本号就 OK。
 
-启动 MySQL 后，执行项目中的初始化脚本：
+---
 
-```bash
-mysql -u root -p < backend/src/main/resources/init.sql
+## 二、下载项目并导入数据库
+
+### 1. 下载代码
+
+在 GitHub 项目页面点击绿色 **Code** 按钮 → **Download ZIP**：
+
+https://github.com/koqht/dormitory-energy-monitor
+
+下载后解压到桌面（或你喜欢的任何位置）。
+
+### 2. 导入数据库
+
+打开 cmd（Windows 搜索框 → 输入 `cmd` → 回车），输入：
+
+```
+mysql -u root -p
 ```
 
-这会自动创建 `dormitory_monitor` 数据库，并插入测试数据（15 间宿舍、450 条用电记录、预警和账单）。
+输入你安装 MySQL 时设置的密码，进入 `mysql>` 提示符后：
 
-> 如果已经创建过数据库，先 `DROP DATABASE dormitory_monitor;` 再导入。
+```
+source C:\Users\你的用户名\Desktop\dormitory-energy-monitor\backend\src\main\resources\init.sql
+```
 
-### 3. 配置数据库连接
+> 上面路径改成你实际解压的位置。执行完就自动创建好数据库和测试数据了。
 
-编辑 `backend/src/main/resources/application.yml`，修改数据库用户名和密码：
+### 3. 修改数据库密码配置
+
+用记事本打开项目里的这个文件：
+
+```
+backend\src\main\resources\application.yml
+```
+
+找到这两行，改成你的 MySQL 用户名和密码：
 
 ```yaml
-spring:
-  datasource:
-    username: root      # 改成你的 MySQL 用户名
-    password: 123456    # 改成你的 MySQL 密码
+username: root      # 你的MySQL用户名（默认就是root）
+password: 123456    # 改成你设置的密码
 ```
 
-### 4. 启动后端
+保存关闭。
 
-```bash
-cd backend
+---
+
+## 三、启动项目
+
+### 方式一：双击启动脚本（推荐）
+
+Windows 用户双击项目根目录下的 **`启动后端.bat`**，等它显示 "Started Application" 后，再双击 **`启动前端.bat`**。
+
+### 方式二：手动分别启动
+
+**启动后端：**打开 cmd，cd 到项目里的 `backend` 目录，输入：
+```
 mvn spring-boot:run
 ```
+看到 `Started Application in xxx seconds` 就表示后端跑起来了。
 
-后端启动在 `http://localhost:8080`
-
-### 5. 启动前端
-
-```bash
-cd frontend
+**启动前端：**再打开一个 cmd，cd 到项目里的 `frontend` 目录，输入：
+```
 npm install
 npm run dev
 ```
+看到 `Local: http://localhost:3000/` 就表示前端跑起来了。
 
-前端启动在 `http://localhost:3000`
+---
 
-### 6. 登录系统
+## 四、打开浏览器使用
 
-| 角色 | 账号 | 密码 |
-|------|------|------|
-| 系统管理员 | admin001 | admin123 |
-| 宿管员 | staff001 | admin123 |
-| 学生 | 20210001 | 123456 |
+浏览器访问 **http://localhost:3000**
 
-## 项目结构
+### 测试账号
 
-```
-├── backend/                  # Spring Boot 后端
-│   ├── pom.xml
-│   └── src/main/
-│       ├── java/com/dormitory/
-│       │   ├── controller/   # REST 控制器
-│       │   ├── service/      # 业务逻辑
-│       │   ├── mapper/       # MyBatis 数据访问
-│       │   ├── entity/       # 实体类
-│       │   └── config/       # 配置
-│       └── resources/
-│           ├── application.yml
-│           └── init.sql       # 数据库初始化
-├── frontend/                 # Vue 3 前端
-│   └── src/
-│       ├── views/            # 页面组件
-│       ├── router/           # 路由
-│       └── api/              # API 封装
-└── PROJECT_DOCUMENTATION.md  # 详细项目文档
-```
+| 角色 | 账号 | 密码 | 看到什么 |
+|------|------|------|----------|
+| 系统管理员 | `admin001` | `admin123` | 用户管理、宿舍管理、电表管理 |
+| 宿管员 | `staff001` | `admin123` | 数据概览、用电查询、预警处理、账单 |
+| 学生 | `20210001` | `123456` | 个人仪表盘、用电图表、账单、预警 |
 
-## 常见问题
-
-**Q: Maven 编译报 "Plugin requires Maven version 3.x"？**  
-A: 你用的是 Maven 3.0.5 以下的旧版本，升级到 3.6+ 即可：
-1. 下载 [Maven 3.8.8](https://maven.apache.org/download.cgi)
-2. 解压后配置环境变量 `MAVEN_HOME` 指向新目录
-
-**Q: 前端启动报 "element-plus" 找不到？**  
-A: 缺少依赖，运行 `cd frontend && npm install` 安装即可。
-
-**Q: 新增用户后列表中看不到？**  
-A: 已修复。默认查询所有用户，无需翻页。
+---
