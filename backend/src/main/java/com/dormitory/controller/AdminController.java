@@ -41,7 +41,7 @@ public class AdminController {
         if (dormitoryId != null) {
             return Result.ok(electricityRecordService.dailyUsage(dormitoryId, days));
         }
-        return Result.ok(electricityRecordService.ranking(days));
+        return Result.ok(electricityRecordService.dailyUsage(null, days));
     }
 
     /** 用电排行 */

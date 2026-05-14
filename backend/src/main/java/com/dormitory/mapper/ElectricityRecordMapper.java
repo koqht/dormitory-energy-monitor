@@ -13,10 +13,10 @@ import java.util.Map;
 @Mapper
 public interface ElectricityRecordMapper extends BaseMapper<ElectricityRecord> {
 
-    @Select("SELECT DATE(collect_time) as date, SUM(usage_kwh) as total " +
-            "FROM electricity_record WHERE dormitory_id = #{dormitoryId} " +
-            "AND collect_time >= #{start} AND collect_time <= #{end} " +
-            "GROUP BY DATE(collect_time) ORDER BY date")
+    @Select("<script>SELECT DATE(collect_time) as date, SUM(usage_kwh) as total " +
+            "FROM electricity_record WHERE collect_time >= #{start} AND collect_time &lt;= #{end}" +
+            "<if test='dormitoryId != null'> AND dormitory_id = #{dormitoryId}</if> " +
+            "GROUP BY DATE(collect_time) ORDER BY date</script>")
     List<Map<String, Object>> dailyUsage(@Param("dormitoryId") Long dormitoryId,
                                          @Param("start") LocalDateTime start,
                                          @Param("end") LocalDateTime end);
